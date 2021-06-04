@@ -17,7 +17,7 @@ class GameControl:
         """
         if self.started and not self.finished:
             self.finish_game()
-
+        
         self.started = True
         self.finished = False
 
@@ -56,10 +56,13 @@ class GameControl:
         :param player: player name being added
         :return:
         """
-        if player and player != "<world>":
-            self.games_list[self.game_index]["players"].append(player)
-            if not self.games_list[self.game_index]["kills"].get(player):
-                self.games_list[self.game_index]["kills"][player] = 0
+        if not player or player == "<world>":
+            return
+
+        self.games_list[self.game_index]["players"].append(player)
+        if not self.games_list[self.game_index]["kills"].get(player):
+            self.games_list[self.game_index]["kills"][player] = 0
+
         return
 
     def add_kill(self, player_from: str, player_to: str) -> None:
