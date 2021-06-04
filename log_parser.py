@@ -63,7 +63,7 @@ class LogParser:
         """
         try:
             pattern = re.compile(r"""
-                                 ^\s{1,2}\d*:\d*\s  # " 13:37 "
+                                 ^\s*\d*:\d*\s  # " 13:37 "
                                  \w{21}             # "ClientUserinfoChanged"    
                                  :\s*               # ": "               
                                  \d*\s*\w\\         # "2 n\" 
