@@ -1,5 +1,6 @@
 import json
 import re
+import hashlib
 from typing import Union
 from game_control import GameControl
 
@@ -13,9 +14,14 @@ class LogParser:
         Opens and make decisions based on lines contents. Can start and end a match
         or send bigger chunck of info to be parsed elsewhere
 
-        :param log_file: the file to be parsed
-        :return: dict - containing all games info
+        :param log_file: str (the file to be parsed)
+        :return: dict (containing all games info)
         """
+        hash = self.get_file_hash(log_file)
+        cache = self.check_cache(hash)
+        if cache:
+            return cache
+
         with open(log_file, "r") as file:
             for line in file:
                 if "InitGame" in line:
@@ -28,7 +34,51 @@ class LogParser:
                 elif "killed" in line:
                     parsed_kill = self.parse_kill_line(line)
                     self.game_control.add_kill(parsed_kill[0], parsed_kill[1])
-        return self.game_control.games_list
+
+        output = self.game_control.games_list
+        return self.save_cache(hash, output)
+
+    @staticmethod
+    def get_file_hash(file: str) -> str:  # pragma: no cover
+        """
+        Returns the SHA1 hash of a given file
+        :param file: str (filename to hash)
+        :return: str (SHA1 hash)
+        """
+        buf_size = 65536
+        sha1 = hashlib.sha1()
+        with open(file, "rb") as file:
+            while True:
+                data = file.read(buf_size)
+                if not data:
+                    break
+                sha1.update(data)
+        return sha1.hexdigest()
+
+    @staticmethod
+    def check_cache(hash: str) -> Union[str, None]:  # pragma: no cover
+        """
+        Check if there's a cache for a given hash
+        :param hash: str (SHA1 hash)
+        :return: str|None (file's content or None)
+        """
+        try:
+            with open(f"cache/{hash}") as cache_file:
+                return json.load(cache_file)
+        except FileNotFoundError:
+            return
+
+    @staticmethod
+    def save_cache(hash: str, content: str) -> str:  # pragma: no cover
+        """
+        Save cache to a file with hashe's name
+        :param hash: str (SHA1 hash)
+        :param content: str (file content)
+        :return: str (file content)
+        """
+        with open(f"cache/{hash}", "w+") as cache_file:
+            json.dump(content, cache_file)
+        return content
 
     @staticmethod
     def parse_kill_line(line: str) -> tuple:

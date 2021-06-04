@@ -1,5 +1,6 @@
-from unittest import TestCase
+from unittest import TestCase, mock
 from log_parser import LogParser
+import json
 
 
 class TestLogParser(TestCase):
@@ -10,9 +11,21 @@ class TestLogParser(TestCase):
         with self.assertRaises(FileNotFoundError):
             response = self.log_parser.parse_log("fake_file")
 
-    def test_parse_log_with_valid_file(self):
+    @mock.patch("log_parser.LogParser.save_cache")
+    @mock.patch("log_parser.LogParser.check_cache")
+    def test_parse_log_with_valid_file(self, mock_check_cache, mock_save_cache):
+        mock_check_cache.return_value = None
+        mock_save_cache.return_value = json.loads("{}")
+
         response = self.log_parser.parse_log("../../challenge/games.log")
         self.assertEqual(dict, type(response))
+
+    @mock.patch("log_parser.LogParser.check_cache")
+    def test_parse_log_with_cache(self, mock_cache):
+        mock_cache.return_value = "CACHED CONTENT"
+
+        response = self.log_parser.parse_log("../../challenge/games.log")
+        self.assertEqual("CACHED CONTENT", response)
 
     def test_parse_kill_line_with_invalid_input(self):
         response = self.log_parser.parse_kill_line(

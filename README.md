@@ -46,3 +46,8 @@ Or:
 * http://127.0.0.1:5000/1
 
 To see the match 1 parsing result (change the number to see more)
+
+## Cache Performance Tests
+
+* Without Cache: ~18ms
+* With Cache: ~3ms
