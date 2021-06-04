@@ -51,3 +51,5 @@ To see the match 1 parsing result (change the number to see more)
 
 * Without Cache: ~18ms
 * With Cache: ~3ms
+
+(Measured with Insomnia response time)
