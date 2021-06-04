@@ -32,7 +32,7 @@ $ python log_parser.py
 
 Run the following code:
 ```
-$ python log_parser.py
+$ python game_api.py
 ```
 
 Go to your web browser and access:
